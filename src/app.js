@@ -2,6 +2,60 @@ const express = require("express");
 
 const app = express();
 
+const { adminAuth, userAuth } = require("./middlewares/auth");
+
+app.use("/admin", adminAuth);
+app.use("/user", userAuth, (req, res) => {
+  res.send("User Data Sent");
+});
+
+app.post("/user/login", (req, res) => {
+  res.send("User logged in successfully!");
+});
+
+app.post("/user/data", (req, res) => {
+  res.send("User logged in successfully!");
+});
+// app.get("/admin", (req, res, next) => {
+//   console.log("Admin auth is getting checked!!");
+//   //Logic of checking if the request is authorized
+//   const token = "req.body?.token";
+//   const isAdminAuthorized = token === "req.body?.token";
+//   if (isAdminAuthorized) {
+//     next();
+//   } else {
+//     res.status(401).send("Unauth request");
+//   }
+// });
+
+// app.get("/user", (req, res) => {
+//   res.send("User Data Sent");
+// });
+
+app.get("/admin/deleteUser", (req, res) => {
+  res.send("Delete a user");
+});
+
+// app.use(
+//   "/user",
+//   (req, res, next) => {
+//     console.log("Handling");
+//     next();
+//     // res.send("Response!!");
+//   },
+//   (req, res, next) => {
+//     // res.send("2nd Response!!");
+//     next();
+//   },
+//   (req, res, next) => {
+//     // res.send("3rd Response!!");
+//     next();
+//   },
+//   (req, res, next) => {
+//     // res.send("4th Response!!");
+//     next();
+//   }
+// );
 //request handlers
 //order of code matters here
 
@@ -14,10 +68,10 @@ const app = express();
 // });
 
 //this will handle only GET calls to /user, it can match /user, user/xyz, user/1
-app.get("/user/:userId", (req, res) => {
-  console.log(req.params);
-  res.send({ firstName: "Muhsin", lastName: "Ali" });
-});
+// app.get("/user/:userId", (req, res) => {
+//   console.log(req.params);
+//   res.send({ firstName: "Muhsin", lastName: "Ali" });
+// });
 
 // app.post("/user", (req, res) => {
 //   // saving data to DB
