@@ -2,20 +2,38 @@ const express = require("express");
 
 const app = express();
 
-const { adminAuth, userAuth } = require("./middlewares/auth");
+//it is necessary, it will handle errors in all routes
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("something went wrong"); //order will not matter here because Erro is thrown in app.get call
+    // so it will be shown here only
+  }
+}); //order of parameters matter here in all cases, 2,3,4 parameters
 
-app.use("/admin", adminAuth);
-app.use("/user", userAuth, (req, res) => {
-  res.send("User Data Sent");
+app.get("/getUserData", (req, res) => {
+  try {
+    //logic of DB call and get user data
+    throw new Error("Error is here");
+    res.send("User Data Sent");
+  } catch (err) {
+    res.status(500).send("Some Error contact support team");
+  }
 });
 
-app.post("/user/login", (req, res) => {
-  res.send("User logged in successfully!");
-});
+// const { adminAuth, userAuth } = require("./middlewares/auth");
 
-app.post("/user/data", (req, res) => {
-  res.send("User logged in successfully!");
-});
+// app.use("/admin", adminAuth);
+// app.use("/user", userAuth, (req, res) => {
+//   res.send("User Data Sent");
+// });
+
+// app.post("/user/login", (req, res) => {
+//   res.send("User logged in successfully!");
+// });
+
+// app.post("/user/data", (req, res) => {
+//   res.send("User logged in successfully!");
+// });
 // app.get("/admin", (req, res, next) => {
 //   console.log("Admin auth is getting checked!!");
 //   //Logic of checking if the request is authorized
