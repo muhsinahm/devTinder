@@ -1,24 +1,64 @@
 const express = require("express");
-
+const connectDB = require("./config/database");
 const app = express();
+const User = require("./models/user");
 
-//it is necessary, it will handle errors in all routes
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("something went wrong"); //order will not matter here because Erro is thrown in app.get call
-    // so it will be shown here only
-  }
-}); //order of parameters matter here in all cases, 2,3,4 parameters
+app.use(express.json()); //middleware activated for all routes
 
-app.get("/getUserData", (req, res) => {
+// app.use("/test", () => {}); will work only for /test route
+
+//app.get("/test", () => {}); will wokr for get and that route
+//Ep-06,07 code
+// Creating SignUp API
+app.post("/signup", async (req, res) => {
+  console.log("Req Body", req.body);
+  // console.log("Req Body", req.body) will give us undefined bacause postman is sending data in JSON format and our server
+  // can't read it, so for that we need to a middleware to convert JSON into JS Object, put into the body
+  const userObj = req.body;
+  //creating new user (instance) of User Model with userObj data
+  const user = new User(userObj);
+  //better to wrap db operations in try catch block
   try {
-    //logic of DB call and get user data
-    throw new Error("Error is here");
-    res.send("User Data Sent");
+    //data will be saved onto db and promise will be returned
+    await user.save();
+    res.send("User Added Successfully");
   } catch (err) {
-    res.status(500).send("Some Error contact support team");
+    res.status(400).send("Error saving the user:" + err.message);
   }
 });
+connectDB()
+  .then(() => {
+    console.log("Database connection established...");
+    //it should run after DB connection is succesfully beacuse if server is connected and API requests have been established but
+    // DB is not connected yet, it may be problemetic
+
+    app.listen(7777, () => {
+      console.log("Server is successfully listening on port 7777...");
+    });
+  })
+  .catch((err) => {
+    console.error("Database cannot be connected!!");
+  });
+
+// Ep-05 code
+
+//it is necessary, it will handle errors in all routes
+// app.use("/", (err, req, res, next) => {
+//   if (err) {
+//     res.status(500).send("something went wrong"); //order will not matter here because Erro is thrown in app.get call
+//     // so it will be shown here only
+//   }
+// }); //order of parameters matter here in all cases, 2,3,4 parameters
+
+// app.get("/getUserData", (req, res) => {
+//   try {
+//     //logic of DB call and get user data
+//     throw new Error("Error is here");
+//     res.send("User Data Sent");
+//   } catch (err) {
+//     res.status(500).send("Some Error contact support team");
+//   }
+// });
 
 // const { adminAuth, userAuth } = require("./middlewares/auth");
 
@@ -50,9 +90,9 @@ app.get("/getUserData", (req, res) => {
 //   res.send("User Data Sent");
 // });
 
-app.get("/admin/deleteUser", (req, res) => {
-  res.send("Delete a user");
-});
+// app.get("/admin/deleteUser", (req, res) => {
+//   res.send("Delete a user");
+// });
 
 // app.use(
 //   "/user",
@@ -105,7 +145,3 @@ app.get("/admin/deleteUser", (req, res) => {
 // app.use("/test", (req, res) => {
 //   res.send("Testing from the server!");
 // });
-
-app.listen(7777, () => {
-  console.log("Server is successfully listening on port 7777...");
-});
